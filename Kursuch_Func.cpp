@@ -1,78 +1,6 @@
 #pragma once
 
 #include "Kursuch_Header.h"
-#include "Kursuch_main.cpp"
-
-vector<Product> searchProducts(const vector<Product>& products, const string& query) {
-    vector<Product> results;
-    for (const auto& product : products) {
-        if (product.name.find(query) != string::npos) {
-            results.push_back(product);
-        }
-    }
-    return results;
-}
-
-vector<Product> filterByPriceRange(const vector<Product>& products, double minPrice, double maxPrice) {
-    vector<Product> filtered;
-    for (const auto& product : products) {
-        if (product.price >= minPrice && product.price <= maxPrice) {
-            filtered.push_back(product);
-        }
-    }
-    return filtered;
-}
-
-void editProduct(vector<Product>& products, int index, const Product& newProduct) {
-    if (index >= 0 && index < products.size()) {
-        products[index] = newProduct;
-        saveDataToFile(products);
-    }
-    else {
-        cerr << "Некорректный индекс продукта.\n";
-    }
-}
-
-void exportToCSV(const vector<Product>& products, const string& filename) {
-    ofstream file(filename);
-    if (!file.is_open()) {
-        cerr << "Ошибка открытия файла для экспорта.\n";
-        return;
-    }
-    file << "Название,Цена,Количество\n";
-    for (const auto& product : products) {
-        file << product.name << "," << product.price << "," << product.quantity << "\n";
-    }
-    file.close();
-}
-
-void displayStatistics(const vector<Product>& products) {
-    if (products.empty()) {
-        cout << "Нет данных для отображения статистики.\n";
-        return;
-    }
-    double totalCost = 0, maxPrice = products[0].price, minPrice = products[0].price;
-    int totalQuantity = 0;
-    for (const auto& product : products) {
-        totalCost += product.price;
-        totalQuantity += product.quantity;
-        if (product.price > maxPrice) maxPrice = product.price;
-        if (product.price < minPrice) minPrice = product.price;
-    }
-    cout << "Общая стоимость товаров: " << totalCost << "\n";
-    cout << "Средняя цена: " << totalCost / products.size() << "\n";
-    cout << "Максимальная цена: " << maxPrice << "\n";
-    cout << "Минимальная цена: " << minPrice << "\n";
-    cout << "Общее количество: " << totalQuantity << "\n";
-}
-
-void logAction(const string& action) {
-    ofstream logFile("log.txt", ios::app);
-    if (logFile.is_open()) {
-        logFile << action << " - " << time(nullptr) << "\n";
-        logFile.close();
-    }
-}
 
 void deleteAllData(vector<Product>& products) {
     clearConsole();
@@ -101,10 +29,11 @@ void sortByQuantity(vector<Product>& products) {
     saveDataToFile(products);
 }
 
-void registration() {
+void registration()
+{
     clearConsole();
     string username, password;
-    string role = "user";
+    string role = "user"; // Новая характеристика "user"
 
     cout << "Введите логин: ";
     cin >> username;
@@ -114,7 +43,10 @@ void registration() {
 
     ofstream file("users.txt", ios::app);
     if (file.is_open()) {
-        file << username << " " << password << " " << role << endl;
+
+
+
+        file << username << " " << password << " " << role << endl; // Запись роли "user"
         file.close();
         cout << "Регистрация завершена успешно!" << endl;
     }
@@ -132,9 +64,11 @@ bool login(string& username, string& password) {
     char ch;
     password = "";
     while ((ch = _getch()) != 13) {
-        if (ch == 8 && !password.empty()) {
-            cout << "\b \b";
-            password.pop_back();
+        if (ch == 8) {
+            if (!password.empty()) {
+                cout << "\b \b";
+                password.pop_back();
+            }
         }
         else {
             cout << "*";
@@ -160,6 +94,7 @@ bool login(string& username, string& password) {
         }
         file.close();
     }
+
 
     cout << "Логин или пароль неверные." << endl;
     return false;
@@ -192,7 +127,7 @@ void manageUsers() {
         int userChoice;
         cin >> userChoice;
         if (userChoice == 0) {
-            return;
+            return; // Возврат назад
         }
         if (userChoice < 1 || userChoice > users.size()) {
             cout << "Неверный выбор пользователя!" << endl;
@@ -202,11 +137,12 @@ void manageUsers() {
         string selectedUser = users[userChoice - 1];
         string username = selectedUser.substr(0, selectedUser.find(' '));
         string password = selectedUser.substr(selectedUser.find(' ') + 1, selectedUser.rfind(' ') - selectedUser.find(' ') - 1);
-        string role = selectedUser.substr(selectedUser.rfind(' ') + 1);
+        string role = selectedUser.substr(selectedUser.rfind(' ') + 1); // Получаем роль пользователя
 
         clearConsole();
         cout << "Вы выбрали пользователя '" << username << "'." << endl;
         cout << "Данные пользователя:" << endl;
+
 
         cout << "Логин: " << username << endl;
         cout << "Пароль: " << password << endl;
@@ -220,7 +156,7 @@ void manageUsers() {
         cin >> actionChoice;
 
         if (actionChoice == 4) {
-            continue;
+            continue; // Возврат к выбору пользователя
         }
 
         switch (actionChoice) {
@@ -257,6 +193,8 @@ void manageUsers() {
         }
 
         ofstream outFile("users.txt");
+
+
         if (!outFile.is_open()) {
             cout << "Ошибка при открытии файла для записи!" << endl;
             return;
@@ -284,6 +222,7 @@ bool validateInput(const string& input) {
 void displayDeleteTableWithMenu(const vector<Product>& products) {
     clearConsole();
 
+    // Вывод таблицы с данными о товарах
     cout << left << setw(10) << "N" << setw(20) << "Название" << setw(10) << "Цена" << setw(10) << "Количество" << "\n";
     cout << string(50, '-') << "\n";
 
@@ -297,6 +236,7 @@ void displayDeleteTableWithMenu(const vector<Product>& products) {
         index++;
     }
 
+    // Вывод меню удаления
     cout << "\nУдалить данные:\n"
         << "1. Удалить по номеру\n"
         << "2. Удалить все данные\n"
@@ -305,21 +245,21 @@ void displayDeleteTableWithMenu(const vector<Product>& products) {
 
 void manageDeletion(vector<Product>& products) {
     while (true) {
-        displayDeleteTableWithMenu(products);
+        displayDeleteTableWithMenu(products); // Вывод таблицы с данными и меню удаления
 
         int deleteChoice;
         cin >> deleteChoice;
-        cin.ignore();
+        cin.ignore(); // Игнорирование символа новой строки после ввода выбора
 
         switch (deleteChoice) {
         case 1: {
             clearConsole();
-            displayDeleteTableWithMenu(products);
+            displayDeleteTableWithMenu(products); // Обновление таблицы перед вводом номера для удаления
             int index;
             cout << "Введите номер продукта для удаления: ";
             cin >> index;
-            if (index > 0 && index <= products.size()) {
-                products.erase(products.begin() + index - 1);
+            if (index > 0 && index <= products.size()) { // Изменение условия на 1-based index
+                products.erase(products.begin() + index - 1); // Корректировка индекса на 0-based
                 saveDataToFile(products);
             }
             else {
@@ -329,7 +269,7 @@ void manageDeletion(vector<Product>& products) {
         }
         case 2:
             clearConsole();
-            displayDeleteTableWithMenu(products);
+            displayDeleteTableWithMenu(products); // Обновление таблицы перед удалением всех данных
             products.clear();
             saveDataToFile(products);
             break;
@@ -358,6 +298,7 @@ void displaySortTableWithMenu(const vector<Product>& products) {
         index++;
     }
 
+    // Вывод меню сортировки
     cout << "\nСортировать данные:\n"
         << "1. Сортировать по названию\n"
         << "2. Сортировать по цене\n"
@@ -367,15 +308,15 @@ void displaySortTableWithMenu(const vector<Product>& products) {
 
 void manageSorting(vector<Product>& products) {
     while (true) {
-        displaySortTableWithMenu(products);
+        displaySortTableWithMenu(products); // Вывод таблицы с данными и меню сортировки
 
         int sortChoice;
         cin >> sortChoice;
-        cin.ignore();
+        cin.ignore(); // Игнорирование символа новой строки после ввода выбора
 
         switch (sortChoice) {
         case 1:
-            sortByName(products);
+            (products);
             break;
         case 2:
             sortByPrice(products);
@@ -392,260 +333,296 @@ void manageSorting(vector<Product>& products) {
     }
 }
 
-void clearConsole() {
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
+void manageUserAccount(const string& currentUser) {
+    while (true) {
+        clearConsole();
+        ifstream file("users.txt");
+        if (!file.is_open()) {
+            cout << "Ошибка при открытии файла пользователей!" << endl;
+            return;
+        }
+
+        vector<string> users;
+        string line;
+        while (getline(file, line)) {
+            users.push_back(line);
+        }
+        file.close();
+
+        string selectedUser;
+        for (const auto& user : users) {
+            if (user.substr(0, user.find(' ')) == currentUser) {
+                selectedUser = user;
+                break;
+            }
+        }
+
+        if (selectedUser.empty()) {
+            cout << "Пользователь не найден!" << endl;
+            return;
+        }
+
+        string username = selectedUser.substr(0, selectedUser.find(' '));
+        string password = selectedUser.substr(selectedUser.find(' ') + 1, selectedUser.rfind(' ') - selectedUser.find(' ') - 1);
+
+        cout << "Выберите, что вы хотите сделать:" << endl;
+        cout << "1. Изменить логин" << endl;
+        cout << "2. Изменить пароль" << endl;
+        cout << "3. Удалить аккаунт" << endl;
+        cout << "4. Вернуться назад" << endl;
+        cout << "Ваш выбор: ";
+        int actionChoice;
+        cin >> actionChoice;
+
+        switch (actionChoice) {
+        case 1: {
+            cout << "Введите новый логин: ";
+            string newUsername;
+            cin >> newUsername;
+            for (auto& user : users) {
+                if (user == selectedUser) {
+                    user.replace(0, username.length(), newUsername);
+
+
+                    selectedUser = user;
+                    username = newUsername;
+                }
+            }
+            cout << "Логин успешно изменен на '" << username << "'!" << endl;
+            break;
+        }
+        case 2: {
+            cout << "Введите новый пароль: ";
+            string newPassword;
+            cin >> newPassword;
+            for (auto& user : users) {
+                if (user == selectedUser) {
+                    size_t pos = user.find(username) + username.length() + 1;
+                    user.replace(pos, password.length(), newPassword);
+                    selectedUser = user;
+                    password = newPassword;
+                }
+            }
+            cout << "Пароль успешно изменен!" << endl;
+            break;
+        }
+        case 3: {
+            users.erase(remove(users.begin(), users.end(), selectedUser), users.end());
+            cout << "Аккаунт успешно удален!" << endl;
+            return; // Возврат в начальное меню
+        }
+        case 4: {
+            return; // Возврат в начальное меню
+        }
+        default:
+            cout << "Неверный выбор!" << endl;
+            continue;
+        }
+
+        ofstream outFile("users.txt");
+        if (!outFile.is_open()) {
+            cout << "Ошибка при открытии файла для записи!" << endl;
+        }
+    }
 }
 
+//////////////////////////////////////////////////
+
 void setInputOutputEncoding() {
-#ifdef _WIN32
-    system("chcp 65001");
-#endif
+SetConsoleCP(1251); 
+SetConsoleOutputCP(1251);
+}
+
+
+void clearConsole()
+{
+    system("cls");
 }
 
 void displayMessage(const string& message) {
     cout << message << endl;
     cout << "Нажмите любую клавишу для продолжения..." << endl;
     _getch();
-    clearConsole();
 }
 
 void displayMainMenu() {
-    cout << "\n=== Главное меню ===\n";
-    cout << "1. Добавить данные\n";
-    cout << "2. Управление данными\n";
-    cout << "3. Сортировать данные\n";
-    cout << "4. Поиск данных\n";
-    cout << "5. Удаление данных\n";
-    cout << "6. Показать статистику\n";
-    cout << "7. Управление пользователями\n";
-    cout << "8. Экспортировать данные в CSV\n";
-    cout << "9. Выход\n";
+    cout << "Выберите действие:\n";
+    cout << "1. Регистрация\n";
+    cout << "2. Вход в систему\n";
+    cout << "3. Выход\n";
     cout << "Ваш выбор: ";
 }
 
-void inputData(vector<Product>& products) {
-    clearConsole();
-    Product newProduct;
+void saveDataToFile(const vector<Product>& products) {
+    ofstream outFile("products.txt"); // Открытие файла для записи
 
-    cout << "Введите название продукта: ";
-    getline(cin, newProduct.name);
+    if (!outFile) {
+        cerr << "Ошибка при открытии файла для записи!" << endl;
+        return;
+    }
 
-    cout << "Введите цену продукта: ";
-    cin >> newProduct.price;
+    for (const auto& product : products) {
+        outFile << product.name << '\n'
+            << product.price << '\n'
+            << product.quantity << '\n';
+    }
 
-    cout << "Введите количество продукта: ";
-    cin >> newProduct.quantity;
-    cin.ignore();
-
-    products.push_back(newProduct);
-    saveDataToFile(products);
-    displayMessage("Данные успешно добавлены.");
+    outFile.close(); // Закрытие файла
+    displayMessage("Данные успешно сохранены в файл.");
 }
 
+void loadDataFromFile(vector<Product>& products) {
+    ifstream inFile("products.txt"); // Открытие файла для чтения
+
+    if (!inFile) {
+        cerr << "Ошибка при открытии файла для чтения!" << endl;
+        return;
+    }
+
+    products.clear(); // Очищаем вектор перед загрузкой новых данных
+
+    Product product;
+    while (getline(inFile, product.name)) { // Чтение имени продукта
+        inFile >> product.price >> product.quantity;
+        inFile.ignore(); // Игнорируем символ новой строки после числа
+        products.push_back(product); // Добавление в вектор
+    }
+
+    inFile.close(); // Закрытие файла
+    displayMessage("Данные успешно загружены из файла.");
+}
+
+void inputData(vector<Product>& products) {
+    Product newProduct;
+    cout << "Введите имя товара: ";
+    cin.ignore(); // Игнорируем остаточный символ новой строки
+    getline(cin, newProduct.name); // Вводим имя товара
+
+    cout << "Введите цену товара: ";
+    cin >> newProduct.price; // Вводим цену товара
+
+    cout << "Введите количество товара: ";
+    cin >> newProduct.quantity; // Вводим количество товара
+
+    products.push_back(newProduct); // Добавляем новый товар в вектор
+    displayMessage("Товар успешно добавлен.");
+}
+
+// Удаляет продукт по номеру
+void deleteByNumber(vector<Product>& products) {
+    int index;
+    cout << "Введите номер товара для удаления (от 1 до " << products.size() << "): ";
+    cin >> index;
+
+    if (index > 0 && index <= products.size()) {
+        products.erase(products.begin() + index - 1);
+        displayMessage("Товар успешно удален.");
+    }
+    else {
+        ("Некорректный номер товара.");
+    }
+}
+
+// Отображает таблицу для поиска продуктов с меню
+void displaySearchTableWithMenu(const vector<Product>& products, const string& query, int searchChoice) {
+    cout << "Поиск данных:\n";
+    cout << "1. По количеству\n";
+    cout << "2. По цене\n";
+    cout << "3. По названию\n";
+    cout << "4. Назад (ESC)\n";
+    cout << "Ваш выбор: ";
+
+    if (searchChoice != 3) {
+        string searchQuery;
+        cout << "Введите запрос для поиска: ";
+        cin.ignore();
+        getline(cin, searchQuery);
+        cout << "Результаты поиска:\n";
+
+        for (const auto& product : products) {
+            bool match = false;
+            if (searchChoice == 1 && to_string(product.quantity).find(searchQuery) != string::npos)
+                match = true;
+            if (searchChoice == 2 && to_string(product.price).find(searchQuery) != string::npos)
+                match = true;
+            if (searchChoice == 3 && product.name.find(searchQuery) != string::npos)
+                match = true;
+
+            if (match) {
+                cout << setw(20) << left << product.name
+                    << setw(10) << product.price
+                    << setw(10) << product.quantity << endl;
+            }
+        }
+    }
+}
+
+// Отображает информацию о продуктах
+void displayInformation(vector<Product>& products) {
+    cout << "Информация о продуктах:\n";
+    for (const auto& product : products) {
+        cout << setw(20) << left << product.name
+            << setw(10) << product.price
+            << setw(10) << product.quantity << endl;
+    }
+}
+
+// Отображает таблицу с меню для управления данными о продуктах
+void displayTableWithMenu(const vector<Product>& products) {
+    cout << "Управление данными товара на складе:\n";
+    cout << "1. Ввести данные о товаре\n";
+    cout << "2. Удалить данные\n";
+    cout << "3. Сортировать данные\n";
+    cout << "4. Поиск данных\n";
+    cout << "5. Назад\n";
+    cout << "Ваш выбор: ";
+}
+
+// Управляет данными о продуктах
 void manageData(vector<Product>& products) {
     while (true) {
         clearConsole();
         displayTableWithMenu(products);
+        string choice;
+        cin >> choice;
 
-        int index;
-        cout << "Введите номер продукта для редактирования или 0 для выхода: ";
-        cin >> index;
-        cin.ignore();
-
-        if (index == 0) break;
-
-        if (index > 0 && index <= products.size()) {
-            Product updatedProduct;
-            cout << "Введите новое название: ";
-            getline(cin, updatedProduct.name);
-
-            cout << "Введите новую цену: ";
-            cin >> updatedProduct.price;
-
-            cout << "Введите новое количество: ";
-            cin >> updatedProduct.quantity;
-            cin.ignore();
-
-            editProduct(products, index - 1, updatedProduct);
+        if (choice == "1") {
+            inputData(products); // Ввод данных
+        }
+        else if (choice == "2") {
+            displayDeleteTableWithMenu(products); // Удаление данных
+        }
+        else if (choice == "3") {
+            (products); // Сортировка данных
+        }
+        else if (choice == "4") {
+            manageSearch(products); // Поиск данных
+        }
+        else if (choice == "5") {
+            break; // Назад
         }
         else {
-            displayMessage("Неверный индекс. Попробуйте снова.");
+            ("Некорректный ввод. Пожалуйста, выберите существующий пункт меню.");
         }
     }
 }
 
-void saveDataToFile(const vector<Product>& products) {
-    ofstream file("products.txt");
-    if (!file.is_open()) {
-        cerr << "Ошибка записи данных в файл.\n";
-        return;
-    }
-    for (const auto& product : products) {
-        file << product.name << "|" << product.price << "|" << product.quantity << "\n";
-    }
-    file.close();
-}
-
-void loadDataFromFile(vector<Product>& products) {
-    ifstream file("products.txt");
-    if (!file.is_open()) {
-        cerr << "Ошибка чтения данных из файла.\n";
-        return;
-    }
-    products.clear();
-    string line;
-    while (getline(file, line)) {
-        Product product;
-        size_t pos1 = line.find('|');
-        size_t pos2 = line.rfind('|');
-        if (pos1 == string::npos || pos2 == string::npos || pos1 == pos2) continue;
-
-        product.name = line.substr(0, pos1);
-        product.price = stod(line.substr(pos1 + 1, pos2 - pos1 - 1));
-        product.quantity = stoi(line.substr(pos2 + 1));
-        products.push_back(product);
-    }
-    file.close();
-}
-
-void displayTableWithMenu(const vector<Product>& products) {
-    cout << left << setw(10) << "N" << setw(20) << "Название" << setw(10) << "Цена" << setw(10) << "Количество" << "\n";
-    cout << string(50, '-') << "\n";
-
-    int index = 1;
-    for (const auto& product : products) {
-        cout << setw(10) << index
-            << setw(20) << product.name
-            << setw(10) << product.price
-            << setw(10) << product.quantity
-            << "\n";
-        index++;
-    }
-}
-
-void deleteByNumber(vector<Product>& products) {
-    int productNumber;
-    cout << "Введите номер продукта для удаления (от 0 до " << products.size() - 1 << "): ";
-    cin >> productNumber;
-
-    // Проверка на валидность индекса
-    if (productNumber >= 0 && productNumber < products.size()) {
-        products.erase(products.begin() + productNumber);
-        cout << "Продукт удален." << endl;
-    }
-    else {
-        cout << "Неверный номер продукта!" << endl;
-    }
-}
-
-void displayInformation(const vector<Product>& products) {
-    if (products.empty()) {
-        cout << "Список продуктов пуст." << endl;
-        return;
-    }
-
-    cout << "Список продуктов:\n";
-    for (size_t i = 0; i < products.size(); ++i) {
-        cout << "Продукт " << i << ":\n";
-        cout << "Название: " << products[i].name << endl;
-        cout << "Цена: " << products[i].price << endl;
-        cout << "Количество: " << products[i].quantity << endl;
-        cout << "---------------------------------" << endl;
-    }
-}
-
-void displaySearchTableWithMenu(const vector<Product>& products, const string& query, int searchChoice) {
-    vector<Product> searchResults;
-
-    for (const auto& product : products) {
-        switch (searchChoice) {
-        case 1: // Поиск по имени
-            if (product.name.find(query) != string::npos) {
-                searchResults.push_back(product);
-            }
-            break;
-        case 2: // Поиск по цене
-            if (to_string(product.price).find(query) != string::npos) {
-                searchResults.push_back(product);
-            }
-            break;
-        case 3: // Поиск по количеству
-            if (to_string(product.quantity).find(query) != string::npos) {
-                searchResults.push_back(product);
-            }
-            break;
-        default:
-            cout << "Неверный выбор поиска." << endl;
-            return;
-        }
-    }
-
-    // Показ результатов
-    if (searchResults.empty()) {
-        cout << "Продукты не найдены." << endl;
-    }
-    else {
-        cout << "Результаты поиска:\n";
-        for (size_t i = 0; i < searchResults.size(); ++i) {
-            cout << "Продукт " << i << ":\n";
-            cout << "Название: " << searchResults[i].name << endl;
-            cout << "Цена: " << searchResults[i].price << endl;
-            cout << "Количество: " << searchResults[i].quantity << endl;
-            cout << "---------------------------------" << endl;
-        }
-    }
-}
-
-void manageUserAccount(const string& currentUser) {
-    int choice;
-    cout << "Добро пожаловать, " << currentUser << endl;
-    cout << "1. Изменить имя\n";
-    cout << "2. Изменить пароль\n";
-    cout << "3. Выйти\n";
-    cout << "Выберите опцию: ";
-    cin >> choice;
-
-    switch (choice) {
-    case 1: {
-        string newName;
-        cout << "Введите новое имя: ";
-        cin >> newName;
-        cout << "Имя изменено на: " << newName << endl;
-        break;
-    }
-    case 2: {
-        string newPassword;
-        cout << "Введите новый пароль: ";
-        cin >> newPassword;
-        cout << "Пароль изменен." << endl;
-        break;
-    }
-    case 3:
-        cout << "Выход из аккаунта..." << endl;
-        break;
-    default:
-        cout << "Неверный выбор!" << endl;
-    }
-}
-
+// Управляет процессом поиска продуктов
 void manageSearch(vector<Product>& products) {
-    string query;
-    int searchChoice;
+    string choice;
+    while (true) {
+        clearConsole();
+        displaySearchTableWithMenu(products);
+        cin >> choice;
 
-    cout << "Введите поисковый запрос: ";
-    cin.ignore(); // Для очистки буфера ввода
-    getline(cin, query);
-
-    cout << "Выберите способ поиска:\n";
-    cout << "1. По имени\n";
-    cout << "2. По цене\n";
-    cout << "3. По количеству\n";
-    cout << "Ваш выбор: ";
-    cin >> searchChoice;
-
-    displaySearchTableWithMenu(products, query, searchChoice);
+        if (choice == "1" || choice == "2" || choice == "3") {
+            displaySearchTableWithMenu(products, "", stoi(choice)); // Поиск по выбранному критерию
+        }
+        else if (choice == "4") {
+            break; // Назад
+        }
+        else {
+            ("Некорректный ввод. Пожалуйста, выберите существующий пункт меню.");
+        }
+    }
 }
