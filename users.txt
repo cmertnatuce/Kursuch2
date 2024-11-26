@@ -1,3 +1,0 @@
-vv 1 user
-gg 1 user
-ff 1 user

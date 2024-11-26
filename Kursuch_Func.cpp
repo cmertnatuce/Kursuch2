@@ -158,55 +158,62 @@ void manageUsers() {
         if (actionChoice == 4) {
             continue; // Возврат к выбору пользователя
         }
+        while (true)
+        {
+            int cho;
 
-        switch (actionChoice) {
-        case 1: {
-            cout << "Введите новый логин для пользователя '" << username << "': ";
-            string newUsername;
-            cin >> newUsername;
-            for (auto& user : users) {
-                if (user == selectedUser) {
-                    user.replace(0, username.length(), newUsername);
+            switch (actionChoice) {
+            case 1: {
+                cout << "Введите новый логин для пользователя '" << username << "': ";
+                string newUsername;
+                cin >> newUsername;
+                for (auto& user : users) {
+                    cout << "Ndrgd" << user;
+                    if (user == selectedUser) {
+                        user.replace(0, username.length(), newUsername);
+                    }
                 }
+                break;
             }
-            break;
-        }
-        case 2: {
-            cout << "Введите новый пароль для пользователя '" << username << "': ";
-            string newPassword;
-            cin >> newPassword;
-            for (auto& user : users) {
-                if (user == selectedUser) {
-                    size_t pos = user.find(username) + username.length() + 1;
-                    user.replace(pos, password.length(), newPassword);
+            case 2: {
+                cout << "Введите новый пароль для пользователя '" << username << "': ";
+                string newPassword;
+                cin >> newPassword;
+                for (auto& user : users) {
+                    if (user == selectedUser) {
+                        size_t pos = user.find(username) + username.length() + 1;
+                        user.replace(pos, password.length(), newPassword);
+                    }
                 }
+                break;
             }
-            break;
-        }
-        case 3: {
-            users.erase(remove(users.begin(), users.end(), selectedUser), users.end());
-            break;
-        }
-        default:
-            cout << "Неверный выбор!" << endl;
-            continue;
-        }
+            case 3: {
+                users.erase(remove(users.begin(), users.end(), selectedUser), users.end());
+                break;
+            }
+            default:
+                cout << "Неверный выбор!" << endl;
+                continue;
+            }
 
-        ofstream outFile("users.txt");
+            ofstream outFile("users.txt");
 
 
-        if (!outFile.is_open()) {
-            cout << "Ошибка при открытии файла для записи!" << endl;
-            return;
-        }
+            if (!outFile.is_open()) {
+                cout << "Ошибка при открытии файла для записи!" << endl;
+                return;
+            }
 
-        for (const auto& user : users) {
-            outFile << user << endl;
-        }
-        outFile.close();
+            for (const auto& user : users) {
+                outFile << user << endl;
+            }
+            outFile.close();
 
-        cout << "Данные успешно обновлены!" << endl;
-        return;
+            cout << "Данные успешно обновлены!" << endl;
+           
+            cin >> cho;
+            if (cho == 0) break;
+        }
     }
 }
 
@@ -381,8 +388,7 @@ void manageUserAccount(const string& currentUser) {
             cin >> newUsername;
             for (auto& user : users) {
                 if (user == selectedUser) {
-                    user.replace(0, username.length(), newUsername);
-
+                    user = newUsername;
 
                     selectedUser = user;
                     username = newUsername;
@@ -423,6 +429,8 @@ void manageUserAccount(const string& currentUser) {
         if (!outFile.is_open()) {
             cout << "Ошибка при открытии файла для записи!" << endl;
         }
+
+        outFile.close();
     }
 }
 
@@ -559,11 +567,17 @@ void displaySearchTableWithMenu(const vector<Product>& products, const string& q
 
 // Отображает информацию о продуктах
 void displayInformation(vector<Product>& products) {
-    cout << "Информация о продуктах:\n";
-    for (const auto& product : products) {
-        cout << setw(20) << left << product.name
-            << setw(10) << product.price
-            << setw(10) << product.quantity << endl;
+    string chose;
+    while (true) {
+        cout << "\nВыход из информации: 0\n";
+        cout << "Информация о продуктах:\n";
+        for (const auto& product : products) {
+            cout << setw(20) << left << product.name
+                << setw(10) << product.price
+                << setw(10) << product.quantity << endl;
+        }
+        cin >> chose;
+        if (stoi(chose) == 0) break;
     }
 }
 
@@ -616,7 +630,7 @@ void manageSearch(vector<Product>& products) {
         cin >> choice;
 
         if (choice == "1" || choice == "2" || choice == "3") {
-            displaySearchTableWithMenu(products, "", stoi(choice)); // Поиск по выбранному критерию
+            (products, "", stoi(choice)); // Поиск по выбранному критерию
         }
         else if (choice == "4") {
             break; // Назад
