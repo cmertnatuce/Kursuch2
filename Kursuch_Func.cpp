@@ -343,6 +343,8 @@ void manageSorting(vector<Product>& products) {
 void manageUserAccount(const string& currentUser) {
     while (true) {
         clearConsole();
+
+        // Чтение всех пользователей из файла
         ifstream file("users.txt");
         if (!file.is_open()) {
             cout << "Ошибка при открытии файла пользователей!" << endl;
@@ -356,6 +358,7 @@ void manageUserAccount(const string& currentUser) {
         }
         file.close();
 
+        // Поиск текущего пользователя
         string selectedUser;
         for (const auto& user : users) {
             if (user.substr(0, user.find(' ')) == currentUser) {
@@ -388,8 +391,7 @@ void manageUserAccount(const string& currentUser) {
             cin >> newUsername;
             for (auto& user : users) {
                 if (user == selectedUser) {
-                    user = newUsername;
-
+                    user.replace(0, username.length(), newUsername);
                     selectedUser = user;
                     username = newUsername;
                 }
@@ -425,14 +427,20 @@ void manageUserAccount(const string& currentUser) {
             continue;
         }
 
+        // Запись обновлённых данных в файл
         ofstream outFile("users.txt");
         if (!outFile.is_open()) {
             cout << "Ошибка при открытии файла для записи!" << endl;
+            return;
         }
 
+        for (const auto& user : users) {
+            outFile << user << endl;
+        }
         outFile.close();
     }
 }
+
 
 //////////////////////////////////////////////////
 
